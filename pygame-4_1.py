@@ -190,6 +190,24 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.x = x + 30 * i
         img_rect.y = y
         surf.blit(img, img_rect)
+
+def show_go_screen():
+    screen.blit(background, background_rect)
+    draw_text(screen, "Моя космическая игра", 42, WIDTH / 2, HEIGHT / 5)
+    draw_text(screen, "Стрелки на клавиатуре для движений", 22,
+              WIDTH / 2, HEIGHT  / 3)
+    draw_text(screen, "Пробел стрелять", 22,
+              WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, "Пожалуйста нажмите Any_key", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
     
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -269,8 +287,21 @@ for i in range(8):
 
 score = 0
 pygame.mixer.music.play(loops=-1)
+game_over = True
 running = True
 while running:
+    if game_over:
+        show_go_screen()
+        game_over = False
+        all_sprites = pygame.sprite.Group()
+        mobs = pygame.sprite.Group()
+        bullets = pygame.sprite.Group()
+        powerups = pygame.sprite.Group()
+        player = Player()
+        all_sprites.add(player)
+        for i in range(8):
+            newmob()
+        score = 0
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -317,7 +348,7 @@ while running:
             power_sound.play()
     
     if player.lives == 0 and not death_explosion.alive():
-        running = False
+        game_over = True
 
     screen.fill(BLACK)
     screen.blit(background, background_rect)
